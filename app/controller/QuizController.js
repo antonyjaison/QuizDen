@@ -44,10 +44,12 @@ const QuizController = {
       if (quiz) {
         // remove answers and send
         const { questions } = quiz;
+
         for (let i = 0; i < questions.length; i++) {
           const { _id, options, id, title } = questions[i];
           questions[i] = { _id, options, id, title };
         }
+        
         quiz.questions = questions;
         return res.status(200).send(quiz);
       }

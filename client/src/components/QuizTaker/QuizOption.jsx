@@ -1,34 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const QuizOption = (props) => {
+const QuizOption = ({ questionId, handleSelectAnswer, id, value, answers }) => {
+  console.log(answers)
+  const [isSelected, setIsSelected] = useState(false);
+
+  useEffect(() => {
+    // Find the question in the answers array
+    const question = answers.find((answer) => answer.question_id === questionId);
+    
+    // Check if the current option id is in the selected answers for the question
+    const isOptionSelected = question?.answers.includes(id);
+    
+    setIsSelected(isOptionSelected);
+  }, [answers, questionId, id]); // Depend on answers, questionId, and id to re-evaluate when they change
+
   return (
-    <div className="col-sm-12">
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="row option-section">
-            <div className="card">
-              <label className="option-label">{props.id + 1}</label>
-            </div>
-            <div className="card">
-              <input
-                className="option-input"
-                type="text"
-                value={props.value}
-                disabled
-              />
-            </div>
-            {/* <div className="card">
-              <button
-                className="remove-option-button"
-                onClick={handleOptionRemove}
-              >
-                <Emoji emoji="⛔️" />
-              </button>
-            </div> */}
-          </div>
-        </div>
-      </div>
-    </div>
+    <button
+      onClick={() => handleSelectAnswer(questionId, id)}
+      className={`row quiz_option ${isSelected ? "option_selected" : ""}`}
+    >
+      <label className={`option-label ${isSelected ? "option_num_selected" : ""}`}>{id}</label>
+      <p className={`option_input`}>{value}</p>
+    </button>
   );
 };
 
