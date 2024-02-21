@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React, { useState } from 'react';
 import "./App.css";
 import Landing from "./components/Landing/Landing";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Registration from "./components/Authentication/Registration";
 import Login from "./components/Authentication/Login";
 import RegistrationDone from "./components/Authentication/RegistrationDone";
@@ -11,212 +10,146 @@ import QuizDone from "./components/QuizBuilder/QuizDone";
 import QuizFetcher from "./components/QuizTaker/QuizFetcher";
 import QuizTaker from "./components/QuizTaker/QuizTaker";
 import QuizTaken from "./components/QuizTaker/QuizTaken";
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    const loginStatus =
-      sessionStorage.getItem("quizden-isLoggedIn") === "LOGGED_IN"
-        ? "LOGGED_IN"
-        : "NOT_LOGGED_IN";
-    this.state = {
-      isLoggedIn: loginStatus,
-      user: {
-        _id: "",
-        name: "",
-        email: "",
-        quizCurated: 0,
-        quizAttended: 0,
-        quizFlawless: 0,
-      },
-      quizAttending: null,
-      quizzes: [],
-      authToken: "",
-    };
-  }
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(sessionStorage.getItem('quizden-isLoggedIn') === 'LOGGED_IN' ? 'LOGGED_IN' : 'NOT_LOGGED_IN');
+  const [user, setUser] = useState({
+    _id: "",
+    name: "",
+    email: "",
+    quizCurated: 0,
+    quizAttended: 0,
+    quizFlawless: 0,
+  });
+  const [quizAttending, setQuizAttending] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
+  const [authToken, setAuthToken] = useState("");
 
-  checkLogin = () => {
-    return sessionStorage.getItem("quizden-isLoggedIn") === "LOGGED_IN";
+  const checkLogin = () => sessionStorage.getItem('quizden-isLoggedIn') === 'LOGGED_IN';
+
+  const handleLogin = (response) => {
+    setIsLoggedIn('LOGGED_IN');
+    setUser(response);
+    setAuthToken(sessionStorage.getItem('quizden-authToken'));
+    sessionStorage.setItem('quizden-isLoggedIn', 'LOGGED_IN');
   };
 
-  // updates the user data globally after Login is successful
-  handleLogin = (response) => {
-    this.setState({
-      isLoggedIn: "LOGGED_IN",
-      user: { ...response },
-      authToken: sessionStorage.getItem("quizden-authToken"),
-    });
-    sessionStorage.setItem("quizden-isLoggedIn", "LOGGED_IN");
+  const handleLogout = () => {
+    setIsLoggedIn('NOT_LOGGED_IN');
+    sessionStorage.removeItem('quizden-isLoggedIn');
+    sessionStorage.removeItem('quizden-authToken');
   };
 
-  handleUserUpdate = (response) => {
-    this.setState({
-      user: { ...response },
-    });
+  const handleUserUpdate = (response) => {
+    setUser(response);
   };
 
-  handleLogout = (event) => {
-    this.setState({ isLoggedIn: "NOT_LOGGED_IN" });
-    sessionStorage.setItem("quizden-isLoggedIn", "");
-    sessionStorage.setItem("quizden-authToken", "");
+  const handleQuizzesCurated = (quizzes) => {
+    setQuizzes(quizzes.reverse());
   };
 
-  handleQuizzesCurated = (quizzes) => {
-    quizzes.reverse();
-    this.setState({ quizzes: quizzes });
+  const handleQuizFetch = (quiz) => {
+    setQuizAttending(quiz);
   };
 
-  handleQuizFetch = (quiz) => {
-    this.setState({ quizAttending: quiz });
-  };
-
-  render() {
-    // if (this.checkLogin()) {
-    //   return <Redirect to={{ pathname: "/dashboard" }} />;
-    // }
-    return (
-      <Router>
-        {/* <NavBar
-          isLoggedIn={this.state.isLoggedIn}
-          checkLogin={this.checkLogin}
-          onLogout={this.handleLogout}
-        /> */}
-        <Switch>
-          <Route
-            exact
-            path="/"
-            render={(props) => (
-              <Landing
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-              />
-            )}
+  return (
+    <Router>
+      <Switch>
+        <Route exact path="/" render={(props) => (
+          <Landing
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
           />
-          
-          <Route
-            exact
-            path="/registration"
-            render={(props) => (
-              <Registration
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-              />
-            )}
+        )} />
+        <Route exact path="/registration" render={(props) => (
+          <Registration 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
           />
-          <Route
-            exact
-            path="/login"
-            render={(props) => (
-              <Login
-                {...props}
-                onLogin={this.handleLogin}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-              />
-            )}
+        )} />
+        <Route exact path="/login" render={(props) => (
+          <Login 
+            {...props} 
+            onLogin={handleLogin} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
           />
-          <Route
-            exact
-            path="/done"
-            render={(props) => (
-              <RegistrationDone
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-              />
-            )}
+        )} />
+        <Route exact path="/done" render={(props) => (
+          <RegistrationDone 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
           />
-          <Route
-            exact
-            path="/dashboard"
-            render={(props) => (
-              <Dashboard
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-                user={this.state.user}
-                quizzes={this.state.quizzes}
-                onQuizLoad={this.handleQuizzesCurated}
-                onUserUpdate={this.handleUserUpdate}
-              />
-            )}
+        )} />
+        <Route exact path="/dashboard" render={(props) => (
+          <Dashboard 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
+            user={user} 
+            quizzes={quizzes} 
+            onQuizLoad={handleQuizzesCurated} onUserUpdate={handleUserUpdate} />
+          )} 
+        />
+        <Route exact path="/quiz-builder" render={(props) => (
+          <QuizBuilder 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
+            user={user} 
+            />
+          )} 
+        />
+        <Route exact path="/quiz-done" render={(props) => (
+          <QuizDone 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
+            user={user}
+             />
+        )} />
+        <Route exact path="/quiz-fetcher" render={(props) => (
+          <QuizFetcher 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
+            onQuizFetch={handleQuizFetch} 
           />
-          <Route
-            exact
-            path="/quiz-builder"
-            render={(props) => (
-              <QuizBuilder
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-                user={this.state.user}
-              />
-            )}
+        )} />
+        <Route exact path="/quiz-taker" render={(props) => (
+          <QuizTaker 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
+            quiz={quizAttending} 
+            user={user} 
           />
-          <Route
-            exact
-            path="/quiz-done"
-            render={(props) => (
-              <QuizDone
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-                user={this.state.user}
-              />
-            )}
+        )} />
+        <Route exact path="/quiz-taken" render={(props) => (
+          <QuizTaken 
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} 
           />
-          <Route
-            exact
-            path="/quiz-fetcher"
-            render={(props) => (
-              <QuizFetcher
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-                onQuizFetch={this.handleQuizFetch}
-              />
-            )}
-          />
-          <Route
-            exact
-            path="/quiz-taker"
-            render={(props) => (
-              <QuizTaker
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-                quiz={this.state.quizAttending}
-                user={this.state.user}
-              />
-            )}
-          />
-          <Route
-            exact
-            path="/quiz-taken"
-            render={(props) => (
-              <QuizTaken
-                {...props}
-                isLoggedIn={this.state.isLoggedIn}
-                checkLogin={this.checkLogin}
-                onLogout={this.handleLogout}
-              />
-            )}
-          />
-        </Switch>
-      </Router>
-    );
-  }
+          )} 
+        />
+      </Switch>
+    </Router>
+  );
 }
 
 export default App;

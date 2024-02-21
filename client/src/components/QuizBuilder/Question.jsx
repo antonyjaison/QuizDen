@@ -2,24 +2,31 @@ import React from "react";
 import Emoji from "../Layout/Emoji";
 import Option from "./Option";
 
-const Question = (props) => {
+const Question = ({
+  onTitleChange,
+  onOptionChange,
+  onOptionRemove,
+  onSelectAnswer,
+  question,
+  onRemove,
+  onAddOption,
+}) => {
   const handleTitleChange = (e) => {
-    props.onTitleChange(props.question.id, e.target.value);
+    onTitleChange(question.id, e.target.value);
   };
 
   const handleOptionChange = (opt_id, value) => {
-    props.onOptionChange(props.question.id, opt_id, value);
+    onOptionChange(question.id, opt_id, value);
   };
 
   const handleOptionRemove = (opt_id) => {
-    props.onOptionRemove(props.question.id, opt_id);
+    onOptionRemove(question.id, opt_id);
   };
 
   const handleSelectAnswer = (e) => {
-    props.onSelectAnswer(props.question.id, parseInt(e.target.value));
+    onSelectAnswer(question.id, parseInt(e.target.value));
   };
 
-  const { question } = props;
   return (
     <div className="col-sm-8 offset-sm-2 section mt-4">
       <div className="row">
@@ -32,6 +39,7 @@ const Question = (props) => {
             onChange={handleTitleChange}
           />
           <div className="row pt-3">
+            {console.log(question)}
             {question.options.map((option) => (
               <Option
                 key={option.id}
@@ -45,39 +53,47 @@ const Question = (props) => {
           <div className="row pt-3">
             <div className="col-sm-12">
               <label className="option-label">[Answer]</label>
-              <select
-                defaultValue=""
+              <div
                 className="option-dropdown"
                 style={{
-                  width: "max-content",
                   marginTop: ".2em",
                   marginLeft: ".5em",
-                  color: "var(--quizden-bg-dark)",
                 }}
-                onChange={handleSelectAnswer}
               >
-                <option value="" disabled hidden>
-                  Select Answer
-                </option>
                 {question.options.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.id + 1 + ": " + option.value}
-                  </option>
+                  <div
+                    key={option.id}
+                    style={{ color: "var(--quizden-bg-dark)" }}
+                  >
+                    <input
+                      type="checkbox"
+                      id={`checkbox-${option.id}`}
+                      name="answer"
+                      value={option.id}
+                      onChange={handleSelectAnswer}
+                    />
+                    <label
+                      htmlFor={`checkbox-${option.id}`}
+                      style={{ marginLeft: ".5em" }}
+                    >
+                      {option.id + ": " + option.value}
+                    </label>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
           </div>
         </div>
         <div className="col-sm-2">
           <button
             className="remove-button"
-            onClick={() => props.onRemove(question.id)}
+            onClick={() => onRemove(question.id)}
           >
             <Emoji emoji="🗑️" /> Remove
           </button>
           <button
             className="add-button"
-            onClick={() => props.onAddOption(question.id)}
+            onClick={() => onAddOption(question.id)}
           >
             <Emoji emoji="✍️" /> Add Option
           </button>

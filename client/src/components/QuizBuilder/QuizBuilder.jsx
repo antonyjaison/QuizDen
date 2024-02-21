@@ -1,222 +1,217 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import NavBar from "../Layout/NavBar";
 import Question from "./Question";
 import Emoji from "../Layout/Emoji";
 import QuizService from "../../service/QuizService";
 import { Redirect } from "react-router-dom";
 
-class QuizBuilder extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+function QuizBuilder({ isLoggedIn, checkLogin, onLogout, history }) {
+  const [quiz, setQuiz] = useState({
+    title: "",
+    description: "",
+    type: "",
+    questions: [],
+  });
+  
+  console.log("quiz_builder => ",quiz)
+
+  // Handles changes to quiz title, description, and type
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      [name]: value,
+    }));
+  };
+
+  // Adds a new question to the quiz
+  const handleAddQuestion = () => {
+    const newQuestion = {
+      id: quiz.questions.length + 1,
       title: "",
-      description: "",
-      type: "",
-      questions: [],
+      options: [],
+      answer: [],
     };
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: [...prevQuiz.questions, newQuestion],
+    }));
+  };
+
+  // Removes a question from the quiz
+  const handleRemoveQuestion = (id) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.filter((question) => question.id !== id),
+    }));
+  };
+
+  // Handles changes to question titles
+  const handleQuestionTitleChange = (id, value) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((question) =>
+        question.id === id ? { ...question, title: value } : question
+      ),
+    }));
+  };
+
+  // Adds a new option to a question
+  const handleQuestionAddOption = (questionId) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((question) =>
+        question.id === questionId
+          ? {
+              ...question,
+              options: [
+                ...question.options,
+                { id: question.options.length + 1, value: "" },
+              ],
+            }
+          : question
+      ),
+    }));
+  };
+
+  // Handles option value changes
+  const handleOptionChange = (questionId, optionId, value) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((question) =>
+        question.id === questionId
+          ? {
+              ...question,
+              options: question.options.map((option) =>
+                option.id === optionId ? { ...option, value: value } : option
+              ),
+            }
+          : question
+      ),
+    }));
+  };
+
+  // Removes an option from a question
+  const handleRemoveOption = (questionId, optionId) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((question) =>
+        question.id === questionId
+          ? {
+              ...question,
+              options: question.options.filter(
+                (option) => option.id !== optionId
+              ),
+            }
+          : question
+      ),
+    }));
+  };
+
+  // Selects the answer for a question
+  const handleSelectAnswer = (questionId, optionId) => {
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz,
+      questions: prevQuiz.questions.map((question) =>
+        question.id === questionId
+          ? { ...question, answer: [...question.answer, optionId] }
+          : question
+      ),
+    }));
+  };
+
+  // Resets the entire quiz to its initial state
+  const handleResetAll = () => {
+    setQuiz({ title: "", description: "", type: "", questions: [] });
+  };
+
+  // Submits the quiz
+  const handleSubmitQuiz = async () => {
+    const response = await QuizService.submit(quiz);
+    if (response !== false) {
+      const { _id } = response;
+      history.push({
+        pathname: "/quiz-done",
+        state: { quiz_id: _id },
+      });
+    } else {
+      // Handle invalid quiz submission
+    }
+  };
+
+  if (!checkLogin()) {
+    return <Redirect to={{ pathname: "/login" }} />;
   }
 
-  handleResetAll = (e) => {
-    this.setState({ title: "", description: "", type: "", questions: [] });
-  };
-
-  handleTitleChange = (e) => {
-    this.setState({ title: e.target.value });
-  };
-
-  handleDescriptionChange = (e) => {
-    this.setState({ description: e.target.value });
-  };
-
-  handleTypeChange = (e) => {
-    this.setState({ type: e.target.value });
-  };
-
-  handleAddQuestion = (e) => {
-    const { questions } = this.state;
-    const id =
-      questions.length === 0 ? 0 : questions[questions.length - 1].id + 1;
-    const title = "";
-    const options = [];
-    const answer = Number(0);
-    questions.push({ id, title, options, answer });
-    this.setState({ questions: questions });
-  };
-
-  copyQuestion = (question) => {
-    const { id, title, answer } = question;
-    const options = [...question.options];
-    return { id, title, answer, options };
-  };
-
-  // question form control
-  handleQuestionTitleChange = (id, value) => {
-    const { questions } = this.state;
-    const index = questions.findIndex((question) => question.id === id);
-    questions[index].title = value;
-    this.setState({ questions: questions });
-  };
-
-  handleQuestionAnswerChange = (id, value) => {};
-
-  handleRemoveQuestion = (id) => {
-    const newQuestions = this.state.questions.filter(
-      (question) => question.id !== id
-    );
-    this.setState({ questions: [...newQuestions] });
-  };
-
-  handleQuestionAddOption = (q_id) => {
-    const { questions } = this.state;
-    const index = questions.findIndex((question) => question.id === q_id);
-    const question = { ...questions[index] };
-    const { options } = question;
-    const opt_id =
-      options.length === 0 ? 0 : options[options.length - 1].id + 1;
-    const option = { id: opt_id, value: "" };
-    options.push(option);
-    question.options = [...options];
-    questions[index] = { ...question };
-    this.setState({ questions: questions });
-  };
-
-  handleOptionChange = (q_id, opt_id, value) => {
-    // console.log(q_id, opt_id, value);
-    const { questions } = this.state;
-    const index = questions.findIndex((question) => question.id === q_id);
-    const question = { ...questions[index] };
-    const { options } = question;
-    const option_index = options.findIndex((option) => option.id === opt_id);
-    options[option_index].value = value;
-    question.options = [...options];
-    questions[index] = { ...question };
-    this.setState({ questions: questions });
-  };
-
-  handleRemoveOption = (q_id, opt_id) => {
-    // console.log("Question", q_id, "Option", opt_id);
-    const { questions } = this.state;
-    const index = questions.findIndex((question) => question.id === q_id);
-    const question = { ...questions[index] };
-    const { options } = question;
-    // const newOptions = options.filter((option) => option.id !== opt_id);
-    const newOptions = [];
-    let counter = 0;
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i];
-      if (option.id === opt_id) continue;
-      option.id = counter++;
-      newOptions.push(option);
-    }
-    question.options = [...newOptions];
-    questions[index] = { ...question };
-    this.setState({ questions: questions });
-  };
-
-  handleSelectAnswer = (q_id, opt_id) => {
-    const { questions } = this.state;
-    const index = questions.findIndex((question) => question.id === q_id);
-    const question = { ...questions[index] };
-    question.answer = opt_id;
-    questions[index] = { ...question };
-    this.setState({ questions: questions });
-  };
-
-  handleSubmitQuiz = () => {
-    QuizService.submit(this.state).then((response) => {
-      if (response === false) {
-        // if the quiz is invalid
-      } else {
-        const { _id } = response;
-        this.props.history.push({
-          pathname: "/quiz-done",
-          state: { quiz_id: _id },
-        });
-      }
-    });
-  };
-
-  render() {
-    if (!this.props.checkLogin()) {
-      return <Redirect to={{ pathname: "/login" }} />;
-    }
-    return (
-      <React.Fragment>
-        <NavBar
-          isLoggedIn={this.props.isLoggedIn}
-          checkLogin={this.props.checkLogin}
-          onLogout={this.props.onLogout}
-        />
-        <div className="container-fluid">
-          <div className="row mt-5">
-            <div className="col-sm-8 offset-sm-2 section">
-              <input
-                className="profile-name input-quiz-title"
-                placeholder="Legendary Quiz Title"
-                value={this.state.title}
-                onChange={this.handleTitleChange}
-              />
-              <input
-                className="profile-email input-quiz-desc mt-1"
-                placeholder="Legendary Quiz Description"
-                value={this.state.description}
-                onChange={this.handleDescriptionChange}
-              />
-              <div className="row mt-5 pl-3">
-                <select
-                  className="option-dropdown"
-                  value={this.state.type}
-                  onChange={this.handleTypeChange}
-                >
-                  <option value="" disabled hidden>
-                    Quiz Type
-                  </option>
-                  <option value="AMATEUR">Amateur</option>
-                  <option value="TIME_TRIAL" disabled>
-                    Time Trial (Pro)
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="row mt-5">
-            {this.state.questions.map((question) => (
-              <Question
-                key={question.id}
-                question={question}
-                onTitleChange={this.handleQuestionTitleChange}
-                onRemove={this.handleRemoveQuestion}
-                onAddOption={this.handleQuestionAddOption}
-                onOptionChange={this.handleOptionChange}
-                onOptionRemove={this.handleRemoveOption}
-                onSelectAnswer={this.handleSelectAnswer}
-              />
-            ))}
-          </div>
-
-          {/* add quiz button  */}
-          <div className="row mt-4 mb-4">
-            <div
-              className="col-sm-12"
-              style={{
-                textAlign: "center",
-              }}
-            >
-              <button className="tool-button" onClick={this.handleAddQuestion}>
-                <Emoji emoji="💣" /> Add Question
-              </button>
-              <button className="tool-button" onClick={this.handleResetAll}>
-                <Emoji emoji="✂️" /> Reset Quiz
-              </button>
-              <button className="tool-button" onClick={this.handleSubmitQuiz}>
-                <Emoji emoji="🔨" /> Submit Quiz
-              </button>
+  return (
+    <React.Fragment>
+      <NavBar
+        isLoggedIn={isLoggedIn}
+        checkLogin={checkLogin}
+        onLogout={onLogout}
+      />
+      <div className="container">
+        <div className="row mt-5">
+          <div className="col-sm-8 offset-sm-2 section">
+            <input
+              className="profile-name input-quiz-title"
+              placeholder="Legendary Quiz Title"
+              name="title"
+              value={quiz.title}
+              onChange={handleInputChange}
+            />
+            <input
+              className="profile-email input-quiz-desc mt-1"
+              placeholder="Legendary Quiz Description"
+              name="description"
+              value={quiz.description}
+              onChange={handleInputChange}
+            />
+            <div className="row mt-5 pl-3">
+              <select
+                className="option-dropdown"
+                name="type"
+                value={quiz.type}
+                onChange={handleInputChange}
+              >
+                <option value="" disabled hidden>
+                  Quiz Type
+                </option>
+                <option value="AMATEUR">Amateur</option>
+                <option value="TIME_TRIAL" disabled>
+                  Time Trial (Pro)
+                </option>
+              </select>
             </div>
           </div>
         </div>
-      </React.Fragment>
-    );
-  }
+        {quiz.questions.map((question, index) => (
+          <Question
+            key={question.id}
+            question={question}
+            onTitleChange={handleQuestionTitleChange}
+            onRemove={handleRemoveQuestion}
+            onAddOption={() => handleQuestionAddOption(question.id)}
+            onSelectAnswer={handleSelectAnswer}
+            onOptionRemove={handleRemoveOption}
+            onOptionChange={handleOptionChange}
+          />
+        ))}
+
+        <div className="row mt-4 mb-4 col-sm-8 offset-sm-2" style={{ textAlign: "center" }}>
+          <button className="tool-button" onClick={handleAddQuestion}>
+            <Emoji emoji="💣" /> Add Question
+          </button>
+          <button className="tool-button" onClick={handleResetAll}>
+            <Emoji emoji="✂️" /> Reset Quiz
+          </button>
+          <button className="tool-button" onClick={handleSubmitQuiz}>
+            <Emoji emoji="🔨" /> Submit Quiz
+          </button>
+        </div>
+      </div>
+    </React.Fragment>
+  );
 }
 
 export default QuizBuilder;

@@ -14,9 +14,19 @@ const Option = (props) => {
     <div className="col-sm-12">
       <div className="row">
         <div className="col-sm-12">
-          <div className="row option-section">
+          <div
+            className=" option-section"
+            style={{
+              display: "flex",
+              height: "fit-content",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <div className="card">
-              <label className="option-label">{props.id + 1}</label>
+              <label className="option-label" style={{ margin: "-5px" }}>
+                {props.id}
+              </label>
             </div>
             <div className="card">
               <input
