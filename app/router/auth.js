@@ -7,13 +7,17 @@ router.get("/", AuthController.verifyToken, (req, res, next) => {
   res.send("Hello From AUTH!");
 });
 
+
 // user login
 router.post("/login", async (req, res, next) => {
+  // console.log(req.body)
   await AuthController.loginUser(req, res, next);
 });
 
 // register new user
 router.post("/registration", async (req, res, next) => {
+  console.log(req.body)
+
   req.body = await AuthController.registerUser(req, res, next);
   // creating the quizzer profile
   await QuizzerController.createQuizzer(req, res, next);

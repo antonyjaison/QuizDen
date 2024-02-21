@@ -17,6 +17,7 @@ const AuthController = {
     try {
       // validating given data
       const { error } = registrationSchema.validate(req.body);
+      console.log(req.body)
       if (error)
         return res.status(400).send("[validation error] Invalid data given.");
 
