@@ -43,10 +43,12 @@ const quizSchema = new mongoose.Schema({
           },
         },
       ],
-      answer: {
-        type: Number,
-        required: true,
-      },
+      answer: [
+        {
+          type: Number,
+          required: true,
+        }
+      ],
     },
   ],
   participated: {
