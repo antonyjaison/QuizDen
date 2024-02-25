@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const QuizOption = ({ questionId, handleSelectAnswer, id, value, answers }) => {
-  console.log(answers)
+const QuizOption = ({ questionId, handleSelectAnswer, id, value, answers, delay }) => {
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {

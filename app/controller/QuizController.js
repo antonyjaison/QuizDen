@@ -2,6 +2,7 @@ const Joi = require("@hapi/joi");
 
 const Quiz = require("../model/Quiz");
 const QuizzerController = require("./QuizzerController");
+const verifyAnswers = require("../../client/src/Utils/VerifyAnswers");
 
 const QuizController = {
   createQuiz: async (req, res, next) => {
@@ -85,42 +86,59 @@ const QuizController = {
       return res.status(400).send("Invalid data given.");
     }
   },
+
+
   submitQuizAnswer: async (req, res, next) => {
     try {
-      const user_id = req.params.user_id;
       const { quiz_id, answers } = req.body;
 
       const quiz = await Quiz.findById(quiz_id);
+
       if (quiz) {
-        let solved = 0;
-        const { questions } = quiz;
-        for (let i = 0; i < questions.length; i++) {
-          if (questions[i].answer === answers[i].answer) {
-            solved++;
-          }
-        }
-
-        // update quiz stats
-        quiz.participated++;
-        quiz.flawless += Number(solved === questions.length); // + 0 or 1
-        const updatedQuiz = await Quiz.findByIdAndUpdate(quiz_id, quiz);
-
-        // update quizzer stats
-        const updatedQuizzer = await QuizzerController.incrementParticipationCount(
-          user_id,
-          solved === questions.length
-        );
-
-        const response = {
-          user_id: user_id,
-          quiz_id: quiz_id,
-          total_questions: questions.length,
-          solved: solved,
-        };
-        res.status(200).send(response);
-      } else {
-        res.status(400).send("Quiz not found!");
+        const result = verifyAnswers(quiz,answers)
+        return res.status(200).send({
+          status:"success",
+          data:result
+        });
+      }else{
+        return res.status(400).send({
+          status:"error",
+          message:"Quiz not found!"
+        });
       }
+
+
+
+      // if (quiz) {
+      //   let solved = 0;
+      //   const { questions } = quiz;
+      //   for (let i = 0; i < questions.length; i++) {
+      //     if (questions[i].answer === answers[i].answer) {
+      //       solved++;
+      //     }
+      //   }
+
+      //   // update quiz stats
+      //   quiz.participated++;
+      //   quiz.flawless += Number(solved === questions.length); // + 0 or 1
+      //   const updatedQuiz = await Quiz.findByIdAndUpdate(quiz_id, quiz);
+
+      //   // update quizzer stats
+      //   const updatedQuizzer = await QuizzerController.incrementParticipationCount(
+      //     user_id,
+      //     solved === questions.length
+      //   );
+
+      //   const response = {
+      //     user_id: user_id,
+      //     quiz_id: quiz_id,
+      //     total_questions: questions.length,
+      //     solved: solved,
+      //   };
+      //   res.status(200).send(response);
+      // } else {
+      //   res.status(400).send("Quiz not found!");
+      // }
     } catch (err) {
       console.log("Error", err);
       return res.status(400).send("Invalid data given.");

@@ -176,6 +176,12 @@
   padding: 26px;
   box-shadow: 6px 6px #6464fc;
 }
+.quiz_section{
+  width: 100%;
+  height: 100vh;
+  background-color: #fff;
+  overflow: hidden;
+}
 
 .profile-name {
   color: var(--quizden-bg-dark);
@@ -359,26 +365,26 @@ button:focus {
   align-items: center;
   gap: 10px;
   margin: 5px;
-  border: 2px solid var(--quizden-light-purple);
+  border: 1px solid #0546aecd;
   padding-left: 10px;
   border-radius: 4px;
-  background-color: #6464fc19;
+  background-color: #0546ae16;
   transition: 0.3s;
   cursor: pointer;
   z-index: 5;
 }
 .quiz_option:hover{
-  border: 2px solid var(--quizden-dark-purple);
-  background-color: #6464fc51;
+  border: 1px solid #0546ae;
+  background-color: #0546ae51;
 }
 .option_selected{
-  border: 2px solid var(--quizden-dark-purple);
-  background-color: #6464fc51;
+  border: 1px solid #0546ae;
+  background-color: #0546ae51;
 }
 
 .next_btn{
   width: 50%;
-  background-color: var(--quizden-deep-purple);
+  background-color: #0545ae;
   border: none;
   padding: 10px;
   font-family: "Roboto", sans-serif;
@@ -387,14 +393,14 @@ button:focus {
   margin: 5px;
 }
 .next_btn:hover{
-  background-color: var(--quizden-darker-purple);
+  background-color: #0751c9;
 }
 
 .option-label {
   font-family: "Lexend Deca", sans-serif;
   font-size: 18px;
   font-weight: bold;
-  color: var(--quizden-darker-purple);
+  color: #0546ae;
   background: none;
   border: none;
   margin-top: 8px;
@@ -404,7 +410,7 @@ button:focus {
   transition: 0.3s;
 }
 .option_num_selected{
-  background-color: #6464fc;
+  background-color: #0546ae;
   color: #f2f2f2;
 }
 
@@ -419,6 +425,47 @@ button:focus {
   margin-right: 1em;
   padding-top: 0.5em; */
   cursor: pointer;
+}
+.start_wrapper{
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.start_wrapper button{
+  width: fit-content;
+  padding: 10px 30px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.animate_to_top{
+  animation: animate_to_top 0.5s ease-in-out;
+}
+.animate_from_bottom{
+  animation: animate_from_bottom 0.5s ease-in-out;
+}
+@keyframes animate_to_top {
+  from{
+    transform: translateY(0%);
+    opacity: 1;
+  }
+  to{
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+}
+
+@keyframes animate_from_bottom{
+  from{
+    transform: translateY(50%);
+    opacity: 0;
+  }
+  to{
+    transform: translateY(0%);
+    opacity: 1;
+  }
 }
 
 /* .option-input:hover,

@@ -49,15 +49,9 @@ const QuizService = {
       });
   },
   submitAnswer: async (request) => {
-    const user_id = sessionStorage.getItem("quizden-user-id");
-    const authToken = sessionStorage.getItem("quizden-authToken");
-    const uri = "/api/v1/quizzes/submit/" + user_id;
+    const uri = "/api/v1/quizzes/submit/";
     return await axios
-      .post(uri, request, {
-        headers: {
-          "auth-token": authToken,
-        },
-      })
+      .post(uri, request)
       .then((response) => {
         return response.data;
       })

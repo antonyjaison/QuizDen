@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useRef } from "react";
 import QuizOption from "./QuizOption";
 
 const QuizQuestion = (props) => {
@@ -6,31 +6,33 @@ const QuizQuestion = (props) => {
     props.onSelectAnswer(questionId, optionId);
   };
 
-  const { question, answers } = props;
+  const { question, answers, handleNextQuestion } = props;
 
   return (
-    <div className="col-sm-8 offset-sm-2 section mt-4">
+    <div className="col-sm-8 offset-sm-2 mt-4 animate_from_bottom">
       <div className="row">
         <div className="col-sm-10">
-          <div className="profile-name">{question.title}</div>
+          <div className="profile-name">{question?.title}</div>
           <div
             style={{ display: "flex", flexDirection: "column" }}
             className="row pt-3"
           >
-            {question.options.map((option) => {
+            {question?.options.map((option, index) => {
               return (
                 <QuizOption
                   key={option.id}
                   id={option.id}
                   value={option.value}
                   handleSelectAnswer={handleSelectAnswer}
-                  questionId={question._id}
+                  questionId={question?._id}
                   answers={answers}
+                  delay={index * 0.2}
                 />
               );
             })}
 
-            <button className="next_btn">Next</button>
+              <button onClick={handleNextQuestion} className="next_btn">Next</button>
+
           </div>
 
           {/* <div className="row pt-3">

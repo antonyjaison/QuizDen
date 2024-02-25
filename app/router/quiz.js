@@ -31,8 +31,7 @@ router.get(
 );
 
 router.post(
-  "/submit/:user_id",
-  AuthController.verifyToken,
+  "/submit",
   async (req, res, next) => {
     await QuizController.submitQuizAnswer(req, res, next);
   }

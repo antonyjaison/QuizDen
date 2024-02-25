@@ -1,19 +1,19 @@
 import React from "react";
 import NavBar from "../Layout/NavBar";
-import { Link, Redirect } from "react-router-dom";
 
 const QuizTaken = (props) => {
-  const { quiz } = props.location.state;
-  //   if (!props.quiz) {
-  //     return <Redirect to={{ pathname: "/dashboard" }} />;
-  //   }
+  const { quiz } = props?.location?.state;
+
+  // filter the correct answers
+  var solved = quiz.filter(q => q.result)
+
   return (
     <React.Fragment>
-      <NavBar
+      {/* <NavBar
         isLoggedIn={props.isLoggedIn}
         checkLogin={props.checkLogin}
         onLogout={props.onLogout}
-      />
+      /> */}
       <div className="container fluid">
         <div className="row">
           <div
@@ -26,7 +26,7 @@ const QuizTaken = (props) => {
               textAlign: "center",
             }}
           >
-            You solved {quiz.solved} out of {quiz.total_questions}!!!
+            You solved {solved.length} out of {quiz.length}!!!
             {/* <span
               style={{
                 color: "var(--quizden-dark-purple)",
@@ -73,23 +73,6 @@ const QuizTaken = (props) => {
             </div>
           </div>
         </div> */}
-        <div className="row">
-          <div
-            className="col-sm-12 mt-5"
-            style={{
-              textAlign: "center",
-            }}
-          >
-            <Link to="/dashboard">
-              <span className="back-to-home ">
-                <span role="img" aria-label="man-walking">
-                  🚶
-                </span>{" "}
-                Go to Dashboard
-              </span>
-            </Link>
-          </div>
-        </div>
       </div>
     </React.Fragment>
   );
