@@ -34,13 +34,8 @@ const QuizService = {
       });
   },
   findById: async (quiz_id) => {
-    const authToken = sessionStorage.getItem("quizden-authToken");
     return await axios
-      .get("/api/v1/quizzes/" + quiz_id, {
-        headers: {
-          "auth-token": authToken,
-        },
-      })
+      .get("/api/v1/quizzes/" + quiz_id)
       .then((response) => {
         return response.data;
       })

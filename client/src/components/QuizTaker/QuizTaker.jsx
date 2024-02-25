@@ -31,6 +31,7 @@ const QuizTaker = ({ user, checkLogin, isLoggedIn, onLogout, history }) => {
     setCurrentQuestion(quizState?.questions[0]);
   }, [quizState]);
 
+
   const handleSelectAnswer = (q_id, opt_id) => {
     setCurrentSelectedAns(true);
     let questionExists = false; // Flag to check if the question ID already exists
@@ -83,6 +84,7 @@ const QuizTaker = ({ user, checkLogin, isLoggedIn, onLogout, history }) => {
       }
     });
   };
+
 
   const handleNextQuestion = () => {
     setCurrentSelectedAns(false);

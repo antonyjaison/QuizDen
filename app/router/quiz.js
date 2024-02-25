@@ -18,7 +18,7 @@ router.get("/", AuthController.verifyToken, async (req, res, next) => {
 });
 
 
-router.get("/:quiz_id", AuthController.verifyToken, async (req, res, next) => {
+router.get("/:quiz_id", async (req, res, next) => {
   await QuizController.findById(req, res, next);
 });
 
