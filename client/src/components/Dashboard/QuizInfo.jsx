@@ -1,8 +1,29 @@
 import React from "react";
 import Emoji from "../Layout/Emoji";
 import DateUtil from "../../Utils/DateUtil";
+import { Link } from "react-router-dom";
+import QuizService from "../../service/QuizService";
 
 const QuizInfo = (props) => {
+
+  const deleteQuizFromDb = (quizID) => {
+    QuizService.deleteQuiz(quizID)
+      .then((response) => {
+        if (response === false) {
+          console.log(response);
+          alert("Error deleting quiz");
+        } else {
+          console.log(response);
+          alert("Quiz deleted successfully");
+          window.location.reload();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Error deleting quiz: " + err.message);
+      });
+  }
+
   return (
     <React.Fragment>
       <tr style={{}}>
@@ -20,9 +41,19 @@ const QuizInfo = (props) => {
           style={{
             fontFamily: `"Lexend Deca", sans-serif`,
             color: "var(--quizden-bg-dark)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            gap: "5px",
           }}
         >
           {props.title}
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Link to={`/update/${props?.id}`}>
+              <button className="update_btn">Update</button>
+            </Link>
+            <button onClick={() => deleteQuizFromDb(props?.id)} className="update_btn">Delete</button>
+          </div>
         </td>
         <td
           style={{

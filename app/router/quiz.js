@@ -22,6 +22,10 @@ router.get("/:quiz_id", async (req, res, next) => {
   await QuizController.findById(req, res, next);
 });
 
+router.get("/quizzes-with-answers/:quizID", async (req, res, next) => {
+  await QuizController.findByIdWithAnswers(req, res, next);
+});
+
 router.get(
   "/quizzer/:user_id",
   AuthController.verifyToken,
@@ -36,5 +40,13 @@ router.post(
     await QuizController.submitQuizAnswer(req, res, next);
   }
 );
+
+router.delete("/delete-quiz/:quizID", AuthController.verifyToken, async (req, res, next) => {
+    await QuizController.deleteQuiz(req, res, next);
+});
+
+router.put("/update-quiz/:quizID", AuthController.verifyToken, async (req, res, next) => {
+    await QuizController.updateQuiz(req, res, next);
+});
 
 module.exports = router;

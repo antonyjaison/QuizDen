@@ -39,6 +39,28 @@ const QuizController = {
     }
   },
 
+  deleteQuiz: async (req, res, next) => {
+    const { quizID } = req.params;
+    console.log(quizID);
+  
+    try {
+      // Check if the quiz exists before attempting to delete.
+      const quizExists = await Quiz.findById(quizID);
+      if (!quizExists) {
+        // If the quiz does not exist, respond with a 404 Not Found status.
+        return res.status(404).send("Quiz not found.");
+      }
+  
+      // If the quiz exists, delete it.
+      await Quiz.findByIdAndDelete(quizID);
+      return res.status(200).send({ message: "Quiz successfully deleted." });
+    } catch (err) {
+      console.error("Error", err); // Using console.error for errors (better for debugging).
+      return res.status(500).send({ error: "An error occurred while deleting the quiz." });
+    }
+  },
+  
+
   findById: async (req, res, next) => {
     try {
       const quiz = await Quiz.findById(req.params.quiz_id);
@@ -52,6 +74,19 @@ const QuizController = {
         }
         
         quiz.questions = questions;
+        return res.status(200).send(quiz);
+      }
+      return res.status(400).send("Quiz not found.");
+    } catch (err) {
+      console.log("Error", err);
+      return res.status(400).send("Invalid data given.");
+    }
+  },
+
+  findByIdWithAnswers: async (req, res, next) => {
+    try {
+      const quiz = await Quiz.findById(req.params.quizID);
+      if (quiz) {
         return res.status(200).send(quiz);
       }
       return res.status(400).send("Quiz not found.");
@@ -87,6 +122,21 @@ const QuizController = {
     }
   },
 
+  updateQuiz: async (req, res, next) => {
+    const { quizID } = req.params
+    const quiz = req.body
+    try {
+      const updatedQuiz = await Quiz.findByIdAndUpdate
+      (quizID, quiz, { new: true });
+      if (updatedQuiz) {
+        return res.status(200).send(updatedQuiz);
+      }
+      return res.status(400).send("Invalid data given.");
+    } catch (err) {
+      console.log("Error", err);
+      return res.status(400).send("Invalid data given.");
+    }
+  },
 
   submitQuizAnswer: async (req, res, next) => {
     try {

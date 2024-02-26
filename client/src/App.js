@@ -11,6 +11,7 @@ import QuizFetcher from "./components/QuizTaker/QuizFetcher";
 import QuizTaker from "./components/QuizTaker/QuizTaker";
 import QuizTaken from "./components/QuizTaker/QuizTaken";
 import { BrowserRouter as Router, Switch, Route, useParams } from 'react-router-dom';
+import QuizEdit from './components/QuizTaker/QuizEddit';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(sessionStorage.getItem('quizden-isLoggedIn') === 'LOGGED_IN' ? 'LOGGED_IN' : 'NOT_LOGGED_IN');
@@ -150,6 +151,16 @@ function App() {
           />
           )} 
         />
+
+        <Route exact path="/update/:quizID" render={(props) => (
+          <QuizEdit             
+            {...props} 
+            isLoggedIn={isLoggedIn} 
+            checkLogin={checkLogin} 
+            onLogout={handleLogout} />
+          )} 
+        />
+
       </Switch>
     </Router>
   );

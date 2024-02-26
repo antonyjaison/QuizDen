@@ -39,7 +39,6 @@ const Question = ({
             onChange={handleTitleChange}
           />
           <div className="row pt-3">
-            {console.log(question)}
             {question.options.map((option) => (
               <Option
                 key={option.id}
